@@ -313,9 +313,10 @@
             // Generate ID with incrementing counter and relevant suffix
             const sequence = counter.toString().padStart(3, '0');
             
-            // Create suffix from first 3 letters of brand + first letter of color
+            // Create suffix from first 3 letters of brand + first letters of each word in color
             const brandCode = brandOfCar.substring(0, 3).toUpperCase();
-            const colorCode = colorOfCar.substring(0, 2).toUpperCase();
+            const colorWords = colorOfCar.trim().split(' ');
+            const colorCode = colorWords.map(word => word.substring(0, 1).toUpperCase()).join('');
             const suffix = `${brandCode}${colorCode}`;
             
             const generatedID = `${prefix}-${sequence}-${suffix}`;
@@ -343,8 +344,32 @@
             // Enable copy button
             document.getElementById('copyBtn').disabled = false;
             
+            // Send data to Google Sheets
+            sendToGoogleSheets(generatedID, prefix, plateNumber, brandOfCar, driverName, colorOfCar);
+            
             // Add to history
             addToHistory(generatedID, plateNumber, brandOfCar, driverName, colorOfCar);
+        }
+
+        function sendToGoogleSheets(id, prefix, plate, brand, driver, color) {
+            // Replace this URL with your Google Apps Script Web App URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyIIhva5M1gk871hqURsoj9eco1Rqq8YVojcAW0bzWGm5lkCtHG9ay9s0j0jlwhaXmj/exec';
+            
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('prefix', prefix);
+            formData.append('plateNumber', plate);
+            formData.append('brand', brand);
+            formData.append('driver', driver);
+            formData.append('color', color);
+            formData.append('timestamp', new Date().toLocaleString());
+            
+            fetch(scriptURL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => console.log('Data sent to Google Sheets successfully'))
+            .catch(error => console.error('Error sending to Google Sheets:', error));
         }
 
         function addToHistory(id, plate, brand, driver, color) {
