@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3152d6 0%, #4c4da7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #3152d6 0%, #4c4da7 100%);
+            color: white;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .reset-btn {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .output-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .output-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .generated-id {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #667eea;
+            text-align: center;
+            word-break: break-all;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .generated-id.empty {
+            color: #ccc;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            width: 100%;
+            background: #4caf50;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #45a049;
+        }
+
+        .copy-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-title {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .history-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .history-empty {
+            color: #999;
+            text-align: center;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .clear-history {
+            width: 100%;
+            background: #ff6b6b;
+            color: white;
+            margin-top: 10px;
+            font-size: 0.9em;
+            padding: 10px;
+        }
+
+        .clear-history:hover {
+            background: #ff5252;
+        }
+
+        .timestamp {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vehicle ID Generator</h1>
+        <p class="subtitle">Generate unique vehicle IDs</p>
+
+        <div class="input-group">
+            <label for="prefix">ID Prefix:</label>
+            <input type="text" id="prefix" placeholder="e.g., VEH, CAR, AUTO" maxlength="10" required>
+        </div>
+
+        <div class="input-group">
+            <label for="plateNumber">Plate Number:</label>
+            <input type="text" id="plateNumber" placeholder="e.g., ABC1234" required>
+        </div>
+
+        <div class="input-group">
+            <label for="brandOfCar">Brand of Car:</label>
+            <input type="text" id="brandOfCar" placeholder="e.g., Toyota, Honda, Ford" required>
+        </div>
+
+        <div class="input-group">
+            <label for="driverName">Driver Name:</label>
+            <input type="text" id="driverName" placeholder="e.g., John Doe" required>
+        </div>
+
+        <div class="input-group">
+            <label for="colorOfCar">Color Of Car:</label>
+            <input type="text" id="colorOfCar" placeholder="e.g., Red, Blue, Black" required>
+        </div>
+
+        <div class="button-group">
+            <button class="generate-btn" onclick="generateID()">Generate ID</button>
+            <button class="reset-btn" onclick="resetForm()">Reset</button>
+        </div>
+
+        <div class="output-section">
+            <div class="output-label">Generated Vehicle ID:</div>
+            <div id="generatedID" class="generated-id empty">No ID generated yet</div>
+            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()" disabled>Copy to Clipboard</button>
+        </div>
+
+        <div class="output-section" id="detailsSection" style="display: none;">
+            <div class="output-label">Vehicle Details:</div>
+            <div id="vehicleDetails" style="background: white; padding: 15px; border-radius: 8px; font-size: 0.95em;"></div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-title">Generation History</div>
+            <div class="input-group" style="margin-bottom: 15px;">
+                <input type="text" id="searchBox" placeholder="Search by ID, plate, brand, driver, or color..." onkeyup="searchHistory()">
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">No history yet</div>
+            </div>
+            <button class="clear-history" onclick="clearHistory()">Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        let history = [];
+        let counter = 1;
+
+        function generateID() {
+            const prefix = document.getElementById('prefix').value.trim().toUpperCase();
+            const plateNumber = document.getElementById('plateNumber').value.trim().toUpperCase();
+            const brandOfCar = document.getElementById('brandOfCar').value.trim();
+            const driverName = document.getElementById('driverName').value.trim();
+            const colorOfCar = document.getElementById('colorOfCar').value.trim();
+            
+            if (!prefix || !plateNumber || !brandOfCar || !driverName || !colorOfCar) {
+                alert('Please fill in all fields!');
+                return;
+            }
+
+            // Generate ID with incrementing counter
+            const sequence = counter.toString().padStart(3, '0');
+            const generatedID = `${prefix}-${sequence}`;
+            
+            // Increment counter for next generation
+            counter++;
+            
+            // Display the generated ID
+            const idElement = document.getElementById('generatedID');
+            idElement.textContent = generatedID;
+            idElement.classList.remove('empty');
+            idElement.classList.add('fade-in');
+            
+            // Display vehicle details
+            const detailsSection = document.getElementById('detailsSection');
+            const detailsElement = document.getElementById('vehicleDetails');
+            detailsSection.style.display = 'block';
+            detailsElement.innerHTML = `
+                <div style="margin-bottom: 8px;"><strong>Plate Number:</strong> ${plateNumber}</div>
+                <div style="margin-bottom: 8px;"><strong>Brand of Car:</strong> ${brandOfCar}</div>
+                <div style="margin-bottom: 8px;"><strong>Driver Name:</strong> ${driverName}</div>
+                <div><strong>Color Of Car:</strong> ${colorOfCar}</div>
+            `;
+            
+            // Enable copy button
+            document.getElementById('copyBtn').disabled = false;
+            
+            // Add to history
+            addToHistory(generatedID, plateNumber, brandOfCar, driverName, colorOfCar);
+        }
+
+        function addToHistory(id, plate, brand, driver, color) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            
+            history.unshift({
+                id: id,
+                plate: plate,
+                brand: brand,
+                driver: driver,
+                color: color,
+                timestamp: timeString
+            });
+            
+            // Keep only last 10 items
+            if (history.length > 10) {
+                history.pop();
+            }
+            
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay(filteredHistory = null) {
+            const historyList = document.getElementById('historyList');
+            const displayHistory = filteredHistory || history;
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">No history yet</div>';
+                return;
+            }
+            
+            if (displayHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-empty">No matching results found</div>';
+                return;
+            }
+            
+            historyList.innerHTML = displayHistory.map(item => `
+                <div class="history-item fade-in">
+                    <div>
+                        <strong>${item.id}</strong> - ${item.plate} (${item.brand})
+                        <div style="font-size: 0.85em; color: #666; margin-top: 4px;">
+                            Driver: ${item.driver} | Color: ${item.color}
+                        </div>
+                    </div>
+                    <span class="timestamp">${item.timestamp}</span>
+                </div>
+            `).join('');
+        }
+
+        function searchHistory() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                updateHistoryDisplay();
+                return;
+            }
+            
+            const filteredHistory = history.filter(item => {
+                return item.id.toLowerCase().includes(searchTerm) ||
+                       item.plate.toLowerCase().includes(searchTerm) ||
+                       item.brand.toLowerCase().includes(searchTerm) ||
+                       item.driver.toLowerCase().includes(searchTerm) ||
+                       item.color.toLowerCase().includes(searchTerm);
+            });
+            
+            updateHistoryDisplay(filteredHistory);
+        }
+
+        function copyToClipboard() {
+            const idText = document.getElementById('generatedID').textContent;
+            
+            if (idText && idText !== 'No ID generated yet') {
+                navigator.clipboard.writeText(idText).then(() => {
+                    const copyBtn = document.getElementById('copyBtn');
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '✓ Copied!';
+                    copyBtn.style.background = '#2196F3';
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                        copyBtn.style.background = '#4caf50';
+                    }, 2000);
+                }).catch(err => {
+                    alert('Failed to copy: ' + err);
+                });
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('prefix').value = '';
+            document.getElementById('plateNumber').value = '';
+            document.getElementById('brandOfCar').value = '';
+            document.getElementById('driverName').value = '';
+            document.getElementById('colorOfCar').value = '';
+            document.getElementById('generatedID').textContent = 'No ID generated yet';
+            document.getElementById('generatedID').classList.add('empty');
+            document.getElementById('detailsSection').style.display = 'none';
+            document.getElementById('copyBtn').disabled = true;
+            counter = 1;
+        }
+
+        function clearHistory() {
+            if (history.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear the history?')) {
+                history = [];
+                document.getElementById('searchBox').value = '';
+                updateHistoryDisplay();
+            }
+        }
+
+        // Allow Enter key to generate ID
+        ['prefix', 'plateNumber', 'brandOfCar', 'driverName', 'colorOfCar'].forEach(id => {
+            document.getElementById(id).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generateID();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
