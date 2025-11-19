@@ -313,9 +313,10 @@
             // Generate ID with incrementing counter and relevant suffix
             const sequence = counter.toString().padStart(3, '0');
             
-            // Create suffix from first 3 letters of brand + first letter of color
+            // Create suffix from first 3 letters of brand + first letters of each word in color
             const brandCode = brandOfCar.substring(0, 3).toUpperCase();
-            const colorCode = colorOfCar.substring(0, 1).toUpperCase();
+            const colorWords = colorOfCar.trim().split(' ');
+            const colorCode = colorWords.map(word => word.substring(0, 1).toUpperCase()).join('');
             const suffix = `${brandCode}${colorCode}`;
             
             const generatedID = `${prefix}-${sequence}-${suffix}`;

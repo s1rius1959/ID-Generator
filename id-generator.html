@@ -315,7 +315,7 @@
             
             // Create suffix from first 3 letters of brand + first letter of color
             const brandCode = brandOfCar.substring(0, 3).toUpperCase();
-            const colorCode = colorOfCar.substring(0, 1).toUpperCase();
+            const colorCode = colorOfCar.substring(0, 2).toUpperCase();
             const suffix = `${brandCode}${colorCode}`;
             
             const generatedID = `${prefix}-${sequence}-${suffix}`;
