@@ -25,16 +25,25 @@ function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     
-    // Parse JSON data
-    var data = JSON.parse(e.postData.contents);
+    // Get parameters from POST request
+    var timestamp = e.parameter.timestamp || new Date().toLocaleString();
+    var id = e.parameter.id || '';
+    var prefix = e.parameter.prefix || '';
+    var plateNumber = e.parameter.plateNumber || '';
+    var brand = e.parameter.brand || '';
+    var driver = e.parameter.driver || '';
+    var color = e.parameter.color || '';
     
-    var timestamp = data.timestamp || new Date().toLocaleString();
-    var id = data.id || '';
-    var prefix = data.prefix || '';
-    var plateNumber = data.plateNumber || '';
-    var brand = data.brand || '';
-    var driver = data.driver || '';
-    var color = data.color || '';
+    // Log for debugging
+    Logger.log('Received data: ' + JSON.stringify({
+      timestamp: timestamp,
+      id: id,
+      prefix: prefix,
+      plateNumber: plateNumber,
+      brand: brand,
+      driver: driver,
+      color: color
+    }));
     
     // Append row to sheet
     sheet.appendRow([timestamp, id, prefix, plateNumber, brand, driver, color]);
@@ -46,6 +55,7 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.JSON);
     
   } catch(error) {
+    Logger.log('Error: ' + error.toString());
     return ContentService.createTextOutput(JSON.stringify({
       'result': 'error',
       'error': error.toString()

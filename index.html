@@ -361,26 +361,28 @@
                 return;
             }
             
-            const data = {
-                id: id,
-                prefix: prefix,
-                plateNumber: plate,
-                brand: brand,
-                driver: driver,
-                color: color,
-                timestamp: new Date().toLocaleString()
-            };
+            // Create FormData instead of JSON
+            const formData = new URLSearchParams();
+            formData.append('timestamp', new Date().toLocaleString());
+            formData.append('id', id);
+            formData.append('prefix', prefix);
+            formData.append('plateNumber', plate);
+            formData.append('brand', brand);
+            formData.append('driver', driver);
+            formData.append('color', color);
+            
+            console.log('Sending data:', {
+                timestamp: new Date().toLocaleString(),
+                id, prefix, plate, brand, driver, color
+            });
             
             fetch(scriptURL, {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
+                body: formData
             })
-            .then(() => {
-                console.log('✅ Data sent to Google Sheets successfully');
+            .then(response => response.text())
+            .then(data => {
+                console.log('✅ Data sent to Google Sheets successfully:', data);
             })
             .catch(error => {
                 console.error('❌ Error sending to Google Sheets:', error);
