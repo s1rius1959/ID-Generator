@@ -25,14 +25,18 @@ function doPost(e) {
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
     
-    var timestamp = e.parameter.timestamp || new Date().toLocaleString();
-    var id = e.parameter.id || '';
-    var prefix = e.parameter.prefix || '';
-    var plateNumber = e.parameter.plateNumber || '';
-    var brand = e.parameter.brand || '';
-    var driver = e.parameter.driver || '';
-    var color = e.parameter.color || '';
+    // Parse JSON data
+    var data = JSON.parse(e.postData.contents);
     
+    var timestamp = data.timestamp || new Date().toLocaleString();
+    var id = data.id || '';
+    var prefix = data.prefix || '';
+    var plateNumber = data.plateNumber || '';
+    var brand = data.brand || '';
+    var driver = data.driver || '';
+    var color = data.color || '';
+    
+    // Append row to sheet
     sheet.appendRow([timestamp, id, prefix, plateNumber, brand, driver, color]);
     
     return ContentService.createTextOutput(JSON.stringify({
